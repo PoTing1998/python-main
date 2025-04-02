@@ -4,10 +4,10 @@
 
     <table class="table table-bordered">
         <tr>
-            <td>台幣總額 : 元 </td>
-            <td>美金總額 : 元 </td>
-            <td>今日匯率 :  </td>
-            <td>現金總額 : 元 </td>
+            <td>台幣總額 : {{data['td']}}元 </td>
+            <td>美金總額 : {{data['ud']}} 元 </td>
+            <td>今日匯率 (出處 : 全球即時匯率API : https://tw.rter.info/howto_currencyapi.php) : {{data['currency']}}  </td>
+            <td>現金總額 : {{data['total']}}元 </td>
         </tr>
     </table>
 </div>
