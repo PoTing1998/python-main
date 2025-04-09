@@ -40,13 +40,14 @@ def home():
     currency = r.json()
 
     #計算總和
-    total = taiwanese_dollars + us_dollars * currency['USDTWD']['Exrate']
+    total = math.floor(taiwanese_dollars + us_dollars * currency['USDTWD']['Exrate'])
 
     data = {
         'total': total,
         'currency': currency['USDTWD']['Exrate'],
         'ud'   : us_dollars,
-        'td'   : taiwanese_dollars
+        'td'   : taiwanese_dollars,
+        'cash_result': cash_result
     }
     return render_template('index.html',data=data)
 
@@ -74,6 +75,17 @@ def submit_cash():
     conn.commit()
 
     return redirect("/")
+
+@app.route('/cash-delete', methods=['POST'])
+def cash_delete():
+    transaction_id = request.value['id']
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""delete from cash WHERE transaction_id = ?""", (transaction_id,))
+
+    conn.commit()
+    return redirect("/")
+
 
 @app.route('/stock')
 def stock_form():
