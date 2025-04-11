@@ -51,6 +51,31 @@ def home():
     total_stock_value = 0
     #計算單一股票資訊
     stock_info = []
+    for stock in unique_stock_list:
+        result = cursor.execute("select * from stock where stock_id = ?", (stock,))
+        result = result.fetchall()
+        stock_cost = 0 #單一股票總花費
+        shares = 0 #單一股票股數
+    
+        for d in result:
+            shares += d[2]
+            stock_cost += d[3] * d[2] + d[4] + d[5]
+        #取地目前股價
+        url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + stock
+
+        response = requests.get(url)
+        data = response.json()
+        price_array = data['data']
+        current_price =float( price_array[len(price_array)-1][6])
+
+        #單一股票總市值
+        total_value =round( shares * current_price)
+        total_stock_value += total_value
+        #單一股票平均成本
+        average_cost = round(stock_cost / shares,2)
+        #單一股票報酬率
+        rate_of_return = round((total_value - stock_cost)*100 / stock_cost,2 )
+      
 
     data = {
         'total': total,
@@ -81,7 +106,7 @@ def submit_cash():
     conn=get_db()
     cursor=conn.cursor()
     cursor.execute("""insert into cash (taiwanese_dollars, us_dollars, note, date_info) values (?, ?, ?, ?)""",
-                   (taiwanese_dollars, us_dollars, note, date))
+                (taiwanese_dollars, us_dollars, note, date))
     conn.commit()
 
     return redirect("/")
