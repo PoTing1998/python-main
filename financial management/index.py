@@ -35,12 +35,22 @@ def home():
     for data in cash_result:
         taiwanese_dollars += data[1]
         us_dollars += data[2]
-    #取得匯率
+    #取得匯率計算總和
     r = requests.get('https://tw.rter.info/capi.php')
     currency = r.json()
-
-    #計算總和
     total = math.floor(taiwanese_dollars + us_dollars * currency['USDTWD']['Exrate'])
+
+    #取得股票資訊
+    result2 = cursor.execute("select * from stock")
+    stock_result = result2.fetchall()
+    unique_stock_list = []  
+    for data in stock_result:
+        if data[1] not in unique_stock_list:
+            unique_stock_list.append(data[1])
+    #計算股票總市值
+    total_stock_value = 0
+    #計算單一股票資訊
+    stock_info = []
 
     data = {
         'total': total,
@@ -90,6 +100,31 @@ def cash_delete():
 @app.route('/stock')
 def stock_form():
     return render_template('stock.html')
+
+@app.route('/stock', methods=['POST'])
+def submit_stock():
+    # 取得股票資訊與日期資料
+    stock_id = request.values['stock-id']
+    stock_num = request.values['stock-num']
+    stock_price = request.values['stock-price']
+    processing_fee =0
+    tax=0
+    if request.values['processing-fee'] != '':
+        processing_fee = request.values['processing-fee']
+    if request.values['tax'] != '':
+        tax = request.values['tax']
+    date = request.values['date']
+
+    #連接資料庫
+    #連接資料庫
+    conn=get_db()
+    cursor=conn.cursor()
+    cursor.execute("""insert into cash (stock_id, stock_num, stock_price,processing_fee,tax, date_info) values (?, ?, ?, ?,?, ?)""",
+                (stock_id, stock_num, stock_price, processing_fee, tax, date))
+    conn.commit()
+
+    return redirect("/")
+
 
 if __name__ == '__main__':
     app.run(debug=True) 
