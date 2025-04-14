@@ -81,14 +81,22 @@ def home():
         average_cost = round(stock_cost / shares, 2)
         # 單一股票報酬率
         rate_of_return = round((total_value - stock_cost)*100 / stock_cost, 2)
+        stock_info.append({'stock_id': stock, 'stock_cost': stock_cost,
+                           'total_value': total_value, 'average_cost': average_cost,
+                           'shares': shares, 'current_price': current_price, 'rate_of_return': rate_of_return})
 
     for stock in stock_info:
         stock['value_percentage'] = round(
             stock['total_value'] * 100 / total_stock_value, 2)
-
+    # 繪製股票圓餅圖
     if len(unique_stock_list) != 0:
         labels = tuple(unique_stock_list)
         sizes = [d[total_value] for d in stock_info]
+        fig, ax = plt.subplots(figsize=(6, 5))
+        ax.pie(sizes, labels=labels, autopct=None, shadow=None)
+        fig.subplots_adjust(top=1, bottom=0, right=0,
+                            left=0, hspace=0, wspace=0)
+        plt.savefig("static/piechart.jpg", dpi=200)
 
     data = {
         'total': total,
@@ -96,8 +104,8 @@ def home():
         'ud': us_dollars,
         'td': taiwanese_dollars,
         'cash_result': cash_result,
-        stock_info: stock_info,
-    }
+        'stock_info': stock_info}
+
     return render_template('index.html', data=data)
 
 
