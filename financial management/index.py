@@ -2,6 +2,10 @@ from flask import Flask, render_template, request,g,redirect
 import sqlite3
 import requests
 import math
+import matplotlib.pyplot as plt 
+import matplotlib
+matplotlib.use('Agg')  # 使用非互動式後端
+
 
 app = Flask(__name__)
 
@@ -75,14 +79,26 @@ def home():
         average_cost = round(stock_cost / shares,2)
         #單一股票報酬率
         rate_of_return = round((total_value - stock_cost)*100 / stock_cost,2 )
-      
+    
+    for stock in stock_info:
+        stock['value_percentage'] = round(stock['total_value'] * 100 / total_stock_value, 2)
+
+    if len(unique_stock_list)!= 0:
+        labels= tuple(unique_stock_list)
+        sizes= [d[total_value] for d in stock_info]
+        
+
+
+
+
 
     data = {
         'total': total,
         'currency': currency['USDTWD']['Exrate'],
         'ud'   : us_dollars,
         'td'   : taiwanese_dollars,
-        'cash_result': cash_result
+        'cash_result': cash_result,
+        stock_info: stock_info,
     }
     return render_template('index.html',data=data)
 

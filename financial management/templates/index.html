@@ -58,6 +58,20 @@
                 <th scope="col">總報酬率(%)</th>
             </tr>
         </thead>
+        <tbody>
+            {% for data in data['stock_info'] %}
+            <tr>
+                <td>{{data['stock_id']}}</td>
+                <td>{{data['shares']}}</td>
+                <td>{{data[current_price]}}</td>
+                <td>{{data['total_value']}}</td>
+                <td>{{data['value_percentage]}}</td>
+                <td>{{data['stock_cost']}}</td>
+                <td>{{data[average_cost]}}</td>
+                <td>{{data[rate_of_return]}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
 
