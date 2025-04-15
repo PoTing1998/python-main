@@ -4,6 +4,7 @@ import sqlite3
 import requests
 import math
 import matplotlib.pyplot as plt
+import os
 import matplotlib
 matplotlib.use('Agg')  # 使用非互動式後端
 
@@ -91,14 +92,37 @@ def home():
     # 繪製股票圓餅圖
     if len(unique_stock_list) != 0:
         labels = tuple(unique_stock_list)
-        sizes = [d[total_value] for d in stock_info]
+        sizes = [d['total_value'] for d in stock_info]
         fig, ax = plt.subplots(figsize=(6, 5))
         ax.pie(sizes, labels=labels, autopct=None, shadow=None)
-        fig.subplots_adjust(top=1, bottom=0, right=0,
+        fig.subplots_adjust(top=1, bottom=0, right=1,
                             left=0, hspace=0, wspace=0)
         plt.savefig("static/piechart.jpg", dpi=200)
+    else :
+        try:
+            os.remove("static/piechart.jpg")
+        except:
+            pass
 
-    data = {
+
+    # 繪製股票現金圓餅圖
+    if us_dollars != 0 or taiwanese_dollars != 0 or total_stock_value != 0:
+        labels = ('USD','TWD','Stock')
+        sizes = (us_dollars * currency['USDTWD']['Exrate'],taiwanese_dollars,total_stock_value)
+        fig, ax = plt.subplots(figsize=(6, 5))
+        ax.pie(sizes, labels=labels, autopct=None, shadow=None)
+        fig.subplots_adjust(top=1, bottom=0, right=1,
+                            left=0, hspace=0, wspace=0)
+        plt.savefig("static/piechart2.jpg", dpi=200)
+    else :
+        try:
+            os.remove("static/piechart2.jpg")
+        except:
+            pass
+
+
+    data = { 'show_pic_1':os.path.exists("static/piechart.jpg"),
+            'show_pic_2':os.path.exists("static/piechart2.jpg"),
         'total': total,
         'currency': currency['USDTWD']['Exrate'],
         'ud': us_dollars,
@@ -171,7 +195,7 @@ def submit_stock():
     # 連接資料庫
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("""insert into cash (stock_id, stock_num, stock_price,processing_fee,tax, date_info) values (?, ?, ?, ?,?, ?)""",
+    cursor.execute("""insert into stock (stock_id, stock_num, stock_price,processing_fee,tax, date_info) values (?, ?, ?, ?,?, ?)""",
                    (stock_id, stock_num, stock_price, processing_fee, tax, date))
     conn.commit()
 
